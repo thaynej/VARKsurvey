@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VARK Learning Style Questionnaire</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,7 +14,7 @@
             margin: 0 auto;
             padding: 20px;
         }
-        h1 {
+        h1, h2 {
             text-align: center;
             color: #2c3e50;
         }
@@ -50,8 +51,18 @@
         }
         #results {
             text-align: center;
-            font-weight: bold;
             font-size: 18px;
+            margin-top: 20px;
+        }
+        #chartContainer {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        #learningStyle {
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 5px;
             margin-top: 20px;
         }
     </style>
@@ -61,6 +72,10 @@
     <div id="quiz"></div>
     <button onclick="calculateScore()">Calculate Score</button>
     <div id="results"></div>
+    <div id="chartContainer">
+        <canvas id="resultsChart"></canvas>
+    </div>
+    <div id="learningStyle"></div>
 
     <script>
         const questions = [
@@ -239,13 +254,87 @@
                 });
             });
 
+            displayResults(scores);
+            createChart(scores);
+            displayLearningStyle(scores);
+        }
+
+        function displayResults(scores) {
             const resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = `
-                Your VARK scores:<br>
-                Visual (V): ${scores.V}<br>
-                Aural (A): ${scores.A}<br>
-                Read/Write (R): ${scores.R}<br>
-                Kinesthetic (K): ${scores.K}
+                <h2>Your VARK Scores</h2>
+                <p>Visual (V): ${scores.V}</p>
+                <p>Aural (A): ${scores.A}</p>
+                <p>Read/Write (R): ${scores.R}</p>
+                <p>Kinesthetic (K): ${scores.K}</p>
+            `;
+        }
+
+        function createChart(scores) {
+            const ctx = document.getElementById('resultsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Visual', 'Aural', 'Read/Write', 'Kinesthetic'],
+                    datasets: [{
+                        label: 'VARK Scores',
+                        data: [scores.V, scores.A, scores.R, scores.K],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 16
+                        }
+                    }
+                }
+            });
+        }
+
+        function displayLearningStyle(scores) {
+            const maxScore = Math.max(scores.V, scores.A, scores.R, scores.K);
+            const dominantStyles = Object.keys(scores).filter(key => scores[key] === maxScore);
+            
+            let styleDescription = '';
+            if (dominantStyles.length > 1) {
+                styleDescription = `You have a multimodal learning preference, with strengths in ${dominantStyles.join(' and ')} learning styles.`;
+            } else {
+                const style = dominantStyles[0];
+                switch(style) {
+                    case 'V':
+                        styleDescription = "You have a strong Visual learning preference. You learn best through visual aids such as diagrams, charts, and graphs. You benefit from using colors, highlighting, and creating mind maps to organize information.";
+                        break;
+                    case 'A':
+                        styleDescription = "You have a strong Aural learning preference. You learn best through listening and speaking. You benefit from discussions, lectures, and explaining ideas to others. Recording notes and listening to them later can be very helpful for you.";
+                        break;
+                    case 'R':
+                        styleDescription = "You have a strong Read/Write learning preference. You learn best through reading and writing. You benefit from making lists, taking notes, and reading texts. Rewriting information in your own words can help you understand and remember better.";
+                        break;
+                    case 'K':
+                        styleDescription = "You have a strong Kinesthetic learning preference. You learn best through hands-on experiences and practical applications. You benefit from experiments, role-playing, and physical activities. Try to find ways to apply theoretical concepts to real-world situations.";
+                        break;
+                }
+            }
+
+            const learningStyleDiv = document.getElementById('learningStyle');
+            learningStyleDiv.innerHTML = `
+                <h2>Your Learning Style</h2>
+                <p>${styleDescription}</p>
+                <p>Remember, everyone uses all four styles to some degree. Your scores indicate your preferences, but it's beneficial to develop skills in all learning styles for more effective overall learning.</p>
             `;
         }
 
