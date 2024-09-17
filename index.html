@@ -226,38 +226,43 @@
         ];
 
         function renderQuiz() {
-            const quizContainer = document.getElementById('quiz');
-            questions.forEach((q, index) => {
-                const questionDiv = document.createElement('div');
-                questionDiv.className = 'question';
-                questionDiv.innerHTML = `
-                    <p><strong>${q.question}</strong></p>
-                    <div class="options">
-                        ${q.options.map((option, optionIndex) => `
-                            <label>
-                                <input type="checkbox" name="q${index}" value="${option.category}">
-                                ${option.text}
-                            </label>
-                        `).join('')}
-                    </div>
-                `;
-                quizContainer.appendChild(questionDiv);
-            });
-        }
+    const quizContainer = document.getElementById('quiz');
+    questions.forEach((q, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'question';
+        questionDiv.innerHTML = `
+            <p><strong>${q.question}</strong></p>
+            <div class="options">
+                ${q.options.map((option, optionIndex) => `
+                    <label>
+                        <input type="radio" name="q${index}" value="${option.category}" required>
+                        ${option.text}
+                    </label>
+                `).join('')}
+            </div>
+        `;
+        quizContainer.appendChild(questionDiv);
+    });
+}
 
-        function calculateScore() {
-            const scores = { V: 0, A: 0, R: 0, K: 0 };
-            questions.forEach((q, index) => {
-                const checkedBoxes = document.querySelectorAll(`input[name="q${index}"]:checked`);
-                checkedBoxes.forEach(box => {
-                    scores[box.value]++;
-                });
-            });
+function calculateScore() {
+    const unansweredQuestions = document.querySelectorAll('.question:not(:has(input:checked))');
+    if (unansweredQuestions.length > 0) {
+        alert('Please answer all questions before calculating your score.');
+        return;
+    }
 
-            displayResults(scores);
-            createChart(scores);
-            displayLearningStyle(scores);
+    const scores = { V: 0, A: 0, R: 0, K: 0 };    questions.forEach((q, index) => {
+        const selectedOption = document.querySelector(`input[name="q${index}"]:checked`);
+        if (selectedOption) {
+            scores[selectedOption.value]++;
         }
+    });
+
+    displayResults(scores);
+    createChart(scores);
+    displayLearningStyle(scores);
+}
 
         function displayResults(scores) {
             const resultsDiv = document.getElementById('results');
