@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VARK Learning Style Questionnaire</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .question {
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 10px;
+        }
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        button {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #results {
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>VARK Learning Style Questionnaire</h1>
+    <div id="quiz"></div>
+    <button onclick="calculateScore()">Calculate Score</button>
+    <div id="results"></div>
+
+    <script>
+        const questions = [
+            {
+                question: "1. You are helping someone who wants to go to your airport, the center of town or railway station. You would:",
+                options: [
+                    { text: "go with her.", category: "K" },
+                    { text: "tell her the directions.", category: "A" },
+                    { text: "write down the directions.", category: "R" },
+                    { text: "draw, or show her a map, or give her a map.", category: "V" }
+                ]
+            },
+            {
+                question: "2. A website has a video showing how to make a special graph. There is a person speaking, some lists and words describing what to do and some diagrams. You would learn most from:",
+                options: [
+                    { text: "seeing the diagrams.", category: "V" },
+                    { text: "listening.", category: "A" },
+                    { text: "reading the words.", category: "R" },
+                    { text: "watching the actions.", category: "K" }
+                ]
+            },
+            {
+                question: "3. You are planning a vacation for a group. You want some feedback from them about the plan. You would:",
+                options: [
+                    { text: "describe some of the highlights they will experience.", category: "K" },
+                    { text: "use a map to show them the places.", category: "V" },
+                    { text: "give them a copy of the printed itinerary.", category: "R" },
+                    { text: "phone, text or email them.", category: "A" }
+                ]
+            },
+            {
+                question: "4. You are going to cook something as a special treat. You would:",
+                options: [
+                    { text: "cook something you know without the need for instructions.", category: "K" },
+                    { text: "ask friends for suggestions.", category: "A" },
+                    { text: "look on the Internet or in some cookbooks for ideas from the pictures.", category: "V" },
+                    { text: "use a good recipe.", category: "R" }
+                ]
+            },
+            {
+                question: "5. A group of tourists want to learn about the parks or wildlife reserves in your area. You would:",
+                options: [
+                    { text: "talk about, or arrange a talk for them about parks or wildlife reserves.", category: "A" },
+                    { text: "show them maps and internet pictures.", category: "V" },
+                    { text: "take them to a park or wildlife reserve and walk with them.", category: "K" },
+                    { text: "give them a book or pamphlets about the parks or wildlife reserves.", category: "R" }
+                ]
+            },
+            {
+                question: "6. You are about to purchase a digital camera or mobile phone. Other than price, what would most influence your decision?",
+                options: [
+                    { text: "Trying or testing it.", category: "K" },
+                    { text: "Reading the details or checking its features online.", category: "R" },
+                    { text: "It is a modern design and looks good.", category: "V" },
+                    { text: "The salesperson telling me about its features.", category: "A" }
+                ]
+            },
+            {
+                question: "7. Remember a time when you learned how to do something new. Avoid choosing a physical skill, eg. riding a bike. You learned best by:",
+                options: [
+                    { text: "watching a demonstration.", category: "K" },
+                    { text: "listening to somebody explaining it and asking questions.", category: "A" },
+                    { text: "diagrams, maps, and charts - visual clues.", category: "V" },
+                    { text: "written instructions – e.g. a manual or book.", category: "R" }
+                ]
+            },
+            {
+                question: "8. You have a problem with your heart. You would prefer that the doctor:",
+                options: [
+                    { text: "gave you a something to read to explain what was wrong.", category: "R" },
+                    { text: "used a plastic model to show what was wrong.", category: "K" },
+                    { text: "described what was wrong.", category: "A" },
+                    { text: "showed you a diagram of what was wrong.", category: "V" }
+                ]
+            },
+            {
+                question: "9. You want to learn a new program, skill or game on a computer. You would:",
+                options: [
+                    { text: "read the written instructions that came with the program.", category: "R" },
+                    { text: "talk with people who know about the program.", category: "A" },
+                    { text: "use the controls or keyboard.", category: "K" },
+                    { text: "follow the diagrams in the book that came with it.", category: "V" }
+                ]
+            },
+            {
+                question: "10. I like websites that have:",
+                options: [
+                    { text: "things I can click on, shift or try.", category: "K" },
+                    { text: "interesting design and visual features.", category: "V" },
+                    { text: "interesting written descriptions, lists and explanations.", category: "R" },
+                    { text: "audio channels where I can hear music, radio programs or interviews.", category: "A" }
+                ]
+            },
+            {
+                question: "11. Other than price, what would most influence your decision to buy a new non-fiction book?",
+                options: [
+                    { text: "The way it looks is appealing.", category: "V" },
+                    { text: "Quickly reading parts of it.", category: "R" },
+                    { text: "A friend talks about it and recommends it.", category: "A" },
+                    { text: "It has real-life stories, experiences and examples.", category: "K" }
+                ]
+            },
+            {
+                question: "12. You are using a book, CD or website to learn how to take photos with your new digital camera. You would like to have:",
+                options: [
+                    { text: "a chance to ask questions and talk about the camera and its features.", category: "A" },
+                    { text: "clear written instructions with lists and bullet points about what to do.", category: "R" },
+                    { text: "diagrams showing the camera and what each part does.", category: "V" },
+                    { text: "many examples of good and poor photos and how to improve them.", category: "K" }
+                ]
+            },
+            {
+                question: "13. Do you prefer a teacher or a presenter who uses:",
+                options: [
+                    { text: "demonstrations, models or practical sessions.", category: "K" },
+                    { text: "question and answer, talk, group discussion, or guest speakers.", category: "A" },
+                    { text: "handouts, books, or readings.", category: "R" },
+                    { text: "diagrams, charts or graphs.", category: "V" }
+                ]
+            },
+            {
+                question: "14. You have finished a competition or test and would like some feedback. You would like to have feedback:",
+                options: [
+                    { text: "using examples from what you have done.", category: "K" },
+                    { text: "using a written description of your results.", category: "R" },
+                    { text: "from somebody who talks it through with you.", category: "A" },
+                    { text: "using graphs showing what you had achieved.", category: "V" }
+                ]
+            },
+            {
+                question: "15. You are going to choose food at a restaurant or cafe. You would:",
+                options: [
+                    { text: "choose something that you have had there before.", category: "K" },
+                    { text: "listen to the waiter or ask friends to recommend choices.", category: "A" },
+                    { text: "choose from the descriptions in the menu.", category: "R" },
+                    { text: "look at what others are eating or look at pictures of each dish.", category: "V" }
+                ]
+            },
+            {
+                question: "16. You have to make an important speech at a conference or special occasion. You would:",
+                options: [
+                    { text: "make diagrams or get graphs to help explain things.", category: "V" },
+                    { text: "write a few key words and practice saying your speech over and over.", category: "A" },
+                    { text: "write out your speech and learn from reading it over several times.", category: "R" },
+                    { text: "gather many examples and stories to make the talk real and practical.", category: "K" }
+                ]
+            }
+        ];
+
+        function renderQuiz() {
+            const quizContainer = document.getElementById('quiz');
+            questions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.innerHTML = `
+                    <p><strong>${q.question}</strong></p>
+                    <div class="options">
+                        ${q.options.map((option, optionIndex) => `
+                            <label>
+                                <input type="checkbox" name="q${index}" value="${option.category}">
+                                ${option.text}
+                            </label>
+                        `).join('')}
+                    </div>
+                `;
+                quizContainer.appendChild(questionDiv);
+            });
+        }
+
+        function calculateScore() {
+            const scores = { V: 0, A: 0, R: 0, K: 0 };
+            questions.forEach((q, index) => {
+                const checkedBoxes = document.querySelectorAll(`input[name="q${index}"]:checked`);
+                checkedBoxes.forEach(box => {
+                    scores[box.value]++;
+                });
+            });
+
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                Your VARK scores:<br>
+                Visual (V): ${scores.V}<br>
+                Aural (A): ${scores.A}<br>
+                Read/Write (R): ${scores.R}<br>
+                Kinesthetic (K): ${scores.K}
+            `;
+        }
+
+        renderQuiz();
+    </script>
+</body>
+</html>
